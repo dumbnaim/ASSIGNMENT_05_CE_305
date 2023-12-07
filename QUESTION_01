@@ -1,0 +1,51 @@
+def store(storage, elm):
+    """
+    Store an element to the memory.
+    """
+    storage.update(elm)
+    return storage
+
+def imm_load_ac(val):
+    """
+    Load accumulator (ac) by immediate addressing.
+    """
+    # In immediate addressing, the operand itself is the value to load.
+    return val
+
+def dir_load_ac(storage, val):
+    """
+    Load accumulator (ac) by direct addressing.
+    """
+    # In direct addressing, the operand is the address of the value to load.
+    return storage[val]
+
+def indir_load_ac(storage, val):
+    """
+    Load accumulator (ac) by indirect addressing.
+    """
+    # In indirect addressing, the operand points to an address which contains the address of the value.
+    return storage[storage[val]]
+
+def idx_load_ac(storage, idx, val):
+    """
+    Load accumulator (ac) by Indexed addressing.
+    """
+    # In indexed addressing, the operand and an index register are added to find the address of the value.
+    address = val + idx
+    return storage.get(address, None)  # Return None if the address is not in storage
+
+# Initialize and store data in memory
+init_mem = {}
+mem = store(init_mem, {800: 123})   # mem = {800: 123}
+mem = store(mem, {900: 1000})       # mem = {800: 123, 900: 1000}
+mem = store(mem, {800: 900})        # mem = {800: 900, 900: 1000}
+mem = store(mem, {1500: 700})       # mem = {800: 900, 900: 1000, 1500: 700}
+
+# Load values into the accumulator using different addressing modes
+ac_imm = imm_load_ac(800)           # ac = 800
+ac_dir = dir_load_ac(mem, 800)      # ac = 900
+ac_indir = indir_load_ac(mem, 800)  # ac = 1000
+idxreg = 700
+ac_idx = idx_load_ac(mem, idxreg, 800)  # ac = 700
+
+print(ac_imm, ac_dir, ac_indir, ac_idx)
