@@ -1,0 +1,57 @@
+def store(storage, elm):
+    """
+    Store an element to the memory.
+    """
+    storage.update(elm)
+    return storage
+
+def fully_assoc_cache_map(cache, mem, address):
+    """
+    Map a block from main memory to a fully associative cache.
+    """
+    # Split the address into tag and word segments
+    tag, word = address[:7], address[7:]
+
+    # Check if the block is already in cache
+    for block in cache.values():
+        if block[0] == tag and block[2] == 1:  # If tag matches and valid bit is 1
+            return cache  # Block is already in cache
+
+    # If block not in cache, find an empty cache line
+    for block_label, block_content in cache.items():
+        if block_content[2] == 0:  # If valid bit is 0, cache line is empty
+            # Map the block to this cache line
+            cache[block_label] = [tag, mem[address], 1]  # Set valid bit to 1
+            return cache
+
+    # If no empty cache line found, implement a replacement strategy
+    # For simplicity, let's replace the first block (could implement LRU, FIFO, etc.)
+    first_block_label = list(cache.keys())[0]
+    cache[first_block_label] = [tag, mem[address], 1]
+
+    return cache
+
+# Initialize memory and store data
+init_mem = {}
+mem = store(init_mem, {"00000110101000": [0, 1, 2, 3, 4, 5, 6, 7]})
+mem = store(mem, {"00001110101000": [10, 11, 12, 13, 14, 15, 16, 17]})
+mem = store(mem, {"00011110101000": [20, 21, 22, 23, 24, 25, 26, 27]})
+mem = store(mem, {"00111110101000": [30, 31, 32, 33, 34, 35, 36, 37]})
+mem = store(mem, {"01111110101000": [40, 41, 42, 43, 44, 45, 46, 47]})
+
+# Initialize cache
+cache = {
+    "blk0": ["0000000", [0, 0, 0, 0, 0, 0, 0, 0], 0],
+    "blk1": ["0000000", [0, 0, 0, 0, 0, 0, 0, 0], 0],
+    "blk2": ["0000000", [0, 0, 0, 0, 0, 0, 0, 0], 0],
+    "blk3": ["0000000", [0, 0, 0, 0, 0, 0, 0, 0], 0]
+}
+
+# Map blocks from memory to cache
+addresses = ["00000110101000", "00001110101000", "00011110101000", "00111110101000", "01111110101000"]
+for addr in addresses:
+    cache = fully_assoc_cache_map(cache, mem, addr)
+
+# Print each cache item on a new line
+for key, value in cache.items():
+    print(f"{key}: {value}")
